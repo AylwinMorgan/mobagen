@@ -4,6 +4,8 @@
 #include "engine/Engine.h"
 
 Vector2f SeparationRule::computeForce(const std::vector<Boid*>& neighborhood, Boid* boid) {
+  
+    
   // Try to avoid boids too close
   Vector2f separatingForce = Vector2f::zero();
 
@@ -17,15 +19,14 @@ Vector2f SeparationRule::computeForce(const std::vector<Boid*>& neighborhood, Bo
     for (Boid* b : neighborhood) {
       Vector2f force = position - b->transform.position;
       float distance = force.getMagnitude();
-      if (distance < desiredDistance) {
-        force = Vector2f::normalized(force) * (1 /(distance/desiredDistance));
+      if (distance < desiredDistance && distance > 0.001f) {
+        force = Vector2f::normalized(force)/distance;
         separatingForce += force;
       }
     }
   }
-
+  
   separatingForce = Vector2f::normalized(separatingForce);
-  //separatingForce = Vector2f::normalized(separatingForce)  separatingForce
 
   return separatingForce;
 }
