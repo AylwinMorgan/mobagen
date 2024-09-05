@@ -6,26 +6,31 @@
 Vector2f BoundedAreaRule::computeForce(const std::vector<Boid*>& neighborhood, Boid* boid) {
   // Return a force proportional to the proximity of the boids with the bounds, and opposed to it
   Vector2f force = Vector2f::zero();  // zero
-  
+  float forceScalar = 2.0f;
   // todo: add here your code code here do make the boid follow the bounded box rule
   // hint: use this->world->engine->window->size() and desiredDistance
   auto size = this->world->engine->window->size();
   auto widthWindows = size.x;
   auto heightWindows = size.y;
 
-  if (boid->getPosition().x < desiredDistance) {
-    force.x += desiredDistance/boid->getPosition().x;
+  float distanceFromLeft = boid->getPosition().x;
+  float distanceFromRight = widthWindows - distanceFromLeft;
+  float distanceFromTop = boid->getPosition().y;
+  float distanceFromBottom = heightWindows - distanceFromTop;
+
+  if (distanceFromLeft < desiredDistance && distanceFromLeft > 0.01f) {
+    force.x += desiredDistance/distanceFromLeft;
   } 
-  else if (boid->getPosition().x > widthWindows - desiredDistance) {
-    force.x -= desiredDistance/(widthWindows - boid->getPosition().x);
+  else if (distanceFromRight < desiredDistance && distanceFromRight > 0.01f) {
+    force.x -= desiredDistance/distanceFromRight;
   }
-  if (boid->getPosition().y < desiredDistance) {
-    force.y += desiredDistance/boid->getPosition().y;
+  if (distanceFromTop < desiredDistance && distanceFromTop > 0.01f) {
+    force.y += desiredDistance/distanceFromTop;
   }
-  else if (boid->getPosition().y > heightWindows - desiredDistance) {
-    force.y -= desiredDistance/(heightWindows - boid->getPosition().y);
+  else if (distanceFromBottom > desiredDistance && distanceFromBottom > 0.01f) {
+    force.y -= desiredDistance/distanceFromBottom;
   }
-  return force;
+  return force * forceScalar;
 }
 
 bool BoundedAreaRule::drawImguiRuleExtra() {
