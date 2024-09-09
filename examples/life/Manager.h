@@ -15,7 +15,7 @@ private:
   void step();
   void clear();
   std::vector<RuleBase*> rules;
-  int ruleId = 0;
+  int ruleId = 1;
   Point2D mousePositionToIndex(ImVec2& pos);
 
 public:
