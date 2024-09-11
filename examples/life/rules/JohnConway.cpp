@@ -10,6 +10,9 @@ void JohnConway::Step(World& world) {
         int neighbors = CountNeighbors(world, point);
         if (neighbors < 2 || neighbors > 3) {
           world.SetNext(point, false);
+        } 
+        else {
+          world.SetNext(point, true);
         }
       }
       else {
