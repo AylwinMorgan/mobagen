@@ -20,6 +20,9 @@ void JohnConway::Step(World& world) {
         if (neighbors == 3) {
           world.SetNext(point, true);
         }
+        else {
+          world.SetNext(point, false);
+        }
       }
     }
   }
