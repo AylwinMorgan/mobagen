@@ -14,11 +14,11 @@
 #define l 18
 #define b 0x9d2c5680UL
 #define c 0xefc60000UL
-#define f 1812433253UL
+#define g 1812433253UL
 
 
 typedef struct {
-  uint32_t stateArray[624];
+  uint32_t stateArray[n];
   int stateIndex;
 } State;
 
