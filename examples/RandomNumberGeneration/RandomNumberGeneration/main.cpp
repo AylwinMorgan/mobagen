@@ -3,7 +3,7 @@
 
 int main() { 
   int lowerBound = 0;
-  int upperBound = 0;
+  int upperBound = 100;
   int numbersToGenerate = 100;
   State* state = new State;
   uint32_t seed = time(0);
