@@ -4,6 +4,16 @@
 #include <climits>
 bool RecursiveBacktrackerExample::Step(World* w) {
   // todo: implement this
+  if (stack.empty()) {
+    int min = w->GetSize() / 2;
+    stack.push_back(Point2D(min,min));
+  }
+  else {
+    Point2D point = stack.back();
+    visited[point.x, point.y] = true;
+    std::vector<Point2D> neighbors;
+    
+  }
   return false;
 }
 
