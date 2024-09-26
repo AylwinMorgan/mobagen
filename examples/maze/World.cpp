@@ -108,17 +108,19 @@ void World::OnDraw(SDL_Renderer* renderer) {
   Vector2f displacement
       = {(windowSize.x / 2) - linesize * (sideSize / 2) - linesize / 2, (windowSize.y / 2) - linesize * (sideSize / 2) - linesize / 2};
 
-  SDL_SetRenderDrawColor(renderer, SDL_ALPHA_OPAQUE, SDL_ALPHA_OPAQUE, SDL_ALPHA_OPAQUE, SDL_ALPHA_OPAQUE);
+  SDL_SetRenderDrawColor(renderer, 200, 10, 10, SDL_ALPHA_OPAQUE);
+  //SDL_RenderClear(renderer);
   for (int i = 0; i < data.size(); i += 2) {
     Vector2f pos = {(float)((i / 2) % (sideSize + 1)), (float)((i / 2) / (sideSize + 1))};
     pos *= linesize;
     pos += displacement;
-
+    SDL_SetRenderDrawColor(renderer, 0, 200, 10, SDL_ALPHA_OPAQUE);
     // north
     if (data[i]) SDL_RenderDrawLine(renderer, (int)pos.x, (int)pos.y, (int)(pos.x + linesize), (int)pos.y);
     // west
     if (data[i + 1]) SDL_RenderDrawLine(renderer, (int)pos.x, (int)pos.y, (int)pos.x, (int)(pos.y + linesize));
   }
+  
 
   for (int i = 0; i < sideSize * sideSize; i++) {
     auto c = colors[i];
@@ -155,7 +157,7 @@ void World::Clear() {
         (i / ((sideSize + 1) * 2) == sideSize && i % 2 == 1))  // remove west elements on the last line
       data[i] = false;
     else
-      data[i] = false;
+      data[i] = true;
   }
 
   // clear the color of the boxes;

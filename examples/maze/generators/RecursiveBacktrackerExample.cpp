@@ -16,22 +16,28 @@ bool RecursiveBacktrackerExample::Step(World* w) {
     if (!neighbors.empty()) {
       int directionIndex = rand() % neighbors.size();
       Point2D newPoint = neighbors[directionIndex];
-      if (point + point.UP == newPoint) {
-        w->SetNorth(point, true);
+      // create a wall for every adjacent visited node that isnt previous
+      Point2D up = point + point.UP;
+      Point2D down = point + point.DOWN;
+      Point2D left = point + point.LEFT;
+      Point2D right = point + point.RIGHT;
+      if (up == newPoint) {
+        w->SetNorth(point, false);
       } 
-      else if (point + point.DOWN == newPoint){
-        w->SetSouth(point, true);      
+      else if (down == newPoint){
+        w->SetSouth(point, false);      
       } 
-      else if (point + point.LEFT == newPoint){
-        w->SetWest(point, true);
+      else if (left == newPoint){
+        w->SetWest(point, false);
       }
-      else if (point + point.RIGHT == newPoint){
-        w->SetEast(point, true);
+      else if (right == newPoint){
+        w->SetEast(point, false);
       }
+      previous = point;
       stack.push_back(newPoint);
     }
     else {
-      w->SetNodeColor(stack.back(),Color32(200,10,10,255));
+      w->SetNodeColor(stack.back(),Color32(0,0,0,255));
       stack.pop_back();
     }
   }
