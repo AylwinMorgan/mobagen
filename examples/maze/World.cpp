@@ -9,6 +9,7 @@ World::World(Engine* pEngine, int size = 11) : GameObject(pEngine), sideSize(siz
   generators.push_back(new PrimExample());
   generators.push_back(new RecursiveBacktrackerExample());
   generators.push_back(new HuntAndKillExample());
+  srand(time(0));
 }
 
 World::~World() {
@@ -154,7 +155,7 @@ void World::Clear() {
         (i / ((sideSize + 1) * 2) == sideSize && i % 2 == 1))  // remove west elements on the last line
       data[i] = false;
     else
-      data[i] = true;
+      data[i] = false;
   }
 
   // clear the color of the boxes;
@@ -173,7 +174,7 @@ void World::Clear() {
 void World::step() {
   auto start = std::chrono::high_resolution_clock::now();
   if (!generators[generatorId]->Step(this)) {
-    isSimulating = false;
+    //isSimulating = false;
   }
   auto stop = std::chrono::high_resolution_clock::now();
   moveDuration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
