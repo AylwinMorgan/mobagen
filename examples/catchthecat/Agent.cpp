@@ -17,11 +17,18 @@ std::vector<Point2D> Agent::generatePath(World* w) {
   Point2D borderExit = Point2D::INFINITE;  // if at the end of the loop we dont find a border, we have to return random points
 
   while (!frontier.empty()) {
+    Point2D current = frontier.front();
+    frontier.pop();
     // get the current from frontier
     // remove the current from frontierset
+    frontierSet.erase(current);
     // mark current as visited
+    visited[current] = true;
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
+    std::vector<Point2D> neighbors = getNeighbors(w, current);
+    
     // iterate over the neighs:
+    
     // for every neighbor set the cameFrom
     // enqueue the neighbors to frontier and frontierset
     // do this up to find a visitable border and break the loop
@@ -31,4 +38,25 @@ std::vector<Point2D> Agent::generatePath(World* w) {
   // if there isnt a reachable border, just return empty vector
   // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
   return vector<Point2D>();
+}
+
+std::vector<Point2D> getNeighbors(World* world, Point2D current) {
+  std::vector<Point2D> neighbors;
+  std::vector<Point2D> validNeighbors;
+
+  neighbors.push_back(world->W(current));
+  neighbors.push_back(world->NW(current));
+  neighbors.push_back(world->NE(current));
+  neighbors.push_back(world->E(current));
+  neighbors.push_back(world->SE(current));
+  neighbors.push_back(world->SW(current));
+
+  for (int i = 0; i < neighbors.size(); i++) {
+    if (world->getCat() != neighbors[i] && world->getContent(neighbors[i])) {
+      validNeighbors.push_back(neighbors[i]);
+    }
+  }
+
+  return validNeighbors;
+
 }
