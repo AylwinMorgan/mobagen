@@ -13,7 +13,7 @@ public:
 
   std::vector<Point2D> generatePath(World* w);
 
-  std::vector<Point2D> getNeighbors(World* world, Point2D current);
+  bool pointIsInQueue(Point2D point, std::queue<Point2D> queue);
 };
 
 #endif  // AGENT_H

@@ -10,6 +10,7 @@ std::vector<Point2D> Agent::generatePath(World* w) {
   unordered_set<Point2D> frontierSet;        // OPTIMIZATION to check faster if a point is in the queue
   unordered_map<Point2D, bool> visited;      // use .at() to get data, if the element dont exist [] will give you wrong results
 
+
   // bootstrap state
   auto catPos = w->getCat();
   frontier.push(catPos);
@@ -25,38 +26,57 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     // mark current as visited
     visited[current] = true;
     // getVisitableNeightbors(world, current) returns a vector of neighbors that are not visited, not cat, not block, not in the queue
-    std::vector<Point2D> neighbors = getNeighbors(w, current);
+    std::vector<Point2D> neighbors;
+    std::vector<Point2D> visitableNeighbors;
+
+    neighbors.push_back(w->W(current));
+    neighbors.push_back(w->NW(current));
+    neighbors.push_back(w->NE(current));
+    neighbors.push_back(w->E(current));
+    neighbors.push_back(w->SE(current));
+    neighbors.push_back(w->SW(current));
+
+    for (int i = 0; i < neighbors.size(); i++) {
+      if (!w->isValidPosition(neighbors[i])) {
+        borderExit = current;
+      }
+      // point is not cat             // point has no wall             // point is not in queue                              // point has not been visited
+      else if (w->getCat() != neighbors[i] && w->getContent(neighbors[i]) && frontierSet.find(neighbors[i]) != frontierSet.end() && !visited[neighbors[i]]) {
+        visitableNeighbors.push_back(neighbors[i]);
+        cameFrom[neighbors[i]] = current;
+        frontier.push(neighbors[i]);
+        frontierSet.insert(neighbors[i]);
+      }
+    }
+    //std::vector<Point2D> neighbors = getNeighbors(w, current);
     
     // iterate over the neighs:
     
     // for every neighbor set the cameFrom
     // enqueue the neighbors to frontier and frontierset
     // do this up to find a visitable border and break the loop
+    if (borderExit != Point2D::INFINITE) {
+      break;
+    }
   }
-
+  vector<Point2D> path;
   // if the border is not infinity, build the path from border to the cat using the camefrom map
+  if (borderExit != Point2D::INFINITE) {
+    path.push_back(borderExit);
+    bool hasReachedCat = false;
+    int maxIterations = 500;
+    int iterations = 0;
+    Point2D currentPoint = borderExit;
+    while (!hasReachedCat && iterations < maxIterations) {
+      currentPoint = cameFrom[currentPoint];
+      path.push_back(currentPoint);
+      if (w->getCat() == currentPoint) {
+        hasReachedCat = true;
+      }
+      iterations++;
+    }
+  }
   // if there isnt a reachable border, just return empty vector
   // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
   return vector<Point2D>();
-}
-
-std::vector<Point2D> getNeighbors(World* world, Point2D current) {
-  std::vector<Point2D> neighbors;
-  std::vector<Point2D> validNeighbors;
-
-  neighbors.push_back(world->W(current));
-  neighbors.push_back(world->NW(current));
-  neighbors.push_back(world->NE(current));
-  neighbors.push_back(world->E(current));
-  neighbors.push_back(world->SE(current));
-  neighbors.push_back(world->SW(current));
-
-  for (int i = 0; i < neighbors.size(); i++) {
-    if (world->getCat() != neighbors[i] && world->getContent(neighbors[i])) {
-      validNeighbors.push_back(neighbors[i]);
-    }
-  }
-
-  return validNeighbors;
-
 }
