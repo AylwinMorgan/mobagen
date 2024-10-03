@@ -35,7 +35,7 @@ std::vector<Point2D> Agent::generatePath(World* w) {
       if (!w->isValidPosition(neighbors[i])) {
         borderExit = current;
       }
-      // point is not cat             // point has no wall                      // point is not in queue                       // point has not been visited
+        // point is not cat                 // point has no wall                     // point is not in queue                   // point has not been visited
       else if (w->getCat() != neighbors[i] && !w->getContent(neighbors[i]) && !frontierSet.contains(neighbors[i]) && !visited[neighbors[i]]) {
         visitableNeighbors.push_back(neighbors[i]);
         cameFrom[neighbors[i]] = current;
