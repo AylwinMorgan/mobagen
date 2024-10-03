@@ -4,6 +4,7 @@
 #include <vector>
 
 class World;
+using namespace std;
 
 class Agent {
 public:
@@ -13,7 +14,6 @@ public:
 
   std::vector<Point2D> generatePath(World* w);
 
-  bool pointIsInQueue(Point2D point, std::queue<Point2D> queue);
 };
 
 #endif  // AGENT_H
