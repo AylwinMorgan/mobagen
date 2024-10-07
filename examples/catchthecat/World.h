@@ -106,6 +106,9 @@ public:
     n.push_back(SE(point));
     return n;
   }
+
+  std::vector<Point2D> getBorderSpaces();
+  int getBorderIndex(Point2D point);
 };
 
 #endif  // WORLD_H

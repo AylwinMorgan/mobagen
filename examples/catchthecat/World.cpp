@@ -3,6 +3,7 @@
 #include <chrono>
 #include "scene/Transform.h"
 #include "engine/Engine.h"
+#include "queue"
 
 void World::print() {
   auto catposid = catPosition.y * (sideSize / 2) + catPosition.x + sideSize * sideSize / 2;
@@ -236,4 +237,44 @@ bool World::catcherCanMoveToPosition(Point2D p) const {
 bool World::catWinsOnSpace(Point2D point) {
   auto sideOver2 = sideSize / 2;
   return abs(point.x) == sideOver2 || abs(point.y) == sideOver2;
+}
+
+std::vector<Point2D> World::getBorderSpaces() {
+  // generates a vector of points where the first value is the top left
+  // the values circle clockwise around the border
+  vector<Point2D> borders;
+  int sizeOver2 = getWorldSideSize() / 2;
+  int x = -sizeOver2;
+  int y = -sizeOver2;
+  for (x = -sizeOver2; x < sizeOver2; x++) {
+    borders.push_back({x, y});
+  }
+  for (y = -sizeOver2 + 1; y < sizeOver2; y++) {
+    borders.push_back({x, y});
+  }
+  for (x = sizeOver2 - 1; x > -sizeOver2; x--) {
+    borders.push_back({x, y});
+  }
+  for (y = sizeOver2 - 1; y > -sizeOver2; y--) {
+    borders.push_back({x, y});
+  }
+  return borders;
+}
+
+int World::getBorderIndex(Point2D point) { 
+    if (abs(point.x) != getWorldSideSize() / 2 && abs(point.y) != getWorldSideSize() / 2) {
+        // point is not a border
+        return -1;
+    }
+    if (point.y == -getWorldSideSize() / 2) {
+      return point.x + getWorldSideSize()/2;
+    }
+    if (point.x == getWorldSideSize() / 2) {
+      return getWorldSideSize() + point.y + getWorldSideSize() / 2;
+    }
+    if (point.y == getWorldSideSize() / 2) {
+      return 3 * getWorldSideSize() - point.x - getWorldSideSize()/2 - 1;
+    }
+    return 4 * getWorldSideSize() - point.y - getWorldSideSize()/2 - 2;
+
 }

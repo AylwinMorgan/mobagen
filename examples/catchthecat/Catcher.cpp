@@ -5,52 +5,44 @@
 #include <queue>
 
 Point2D Catcher::Move(World* world) {
-  // first check if cat is one step from winning
-  bool imminentCatWin = false;
-  Point2D catPosition = world->getCat();
-  Point2D winningPosition;
-  std::vector<Point2D> catNeighbors = world->neighbors(catPosition);
+  
 
-  for (int i = 0; i < catNeighbors.size(); i++) {
-    if (world->catWinsOnSpace(catNeighbors[i]) && world->catCanMoveToPosition(catNeighbors[i])) {
-      imminentCatWin = true;
-      winningPosition = catNeighbors[i];
-      break;
+
+  // first check if cat is one step from winning and fill in the winning space if needed
+  // otherwise check if the cat is two steps from winning on a tile that has less than 2 filled border neighbors, fill if needed
+  // otherwise check if there is a border space with no border neighbors, if there is, fill the closest one
+  // otherwise fill the cats target (closest border tile) if one is reachable
+  // otherwise fill randomly
+
+  // watch out for top and bottom right corners, they require special logic
+
+  vector<Point2D> catPath = generatePath(world);
+  Point2D catTarget = catPath.back();
+  vector<Point2D> borders = world->getBorderSpaces();
+  int targetBorderIndex = world->getBorderIndex(catTarget);
+  int numberOfBorders = borders.size();
+  int numberOfAdjacentWalls = 0;
+  
+
+  if (catPath.size() == 1) {
+    return catTarget;
+  }
+  if (catPath.size() == 2) {
+    int numberOfAdjactentBorderWalls = 0;
+    if (world->getContent(borders[(targetBorderIndex - 1) % numberOfBorders])) {
+      numberOfAdjactentBorderWalls++;
+    }
+    if (world->getContent(borders[(targetBorderIndex + 1) % numberOfBorders])) {
+      numberOfAdjactentBorderWalls++;
+    }
+    if (numberOfAdjactentBorderWalls < 2) {
+      return catTarget;
     }
   }
-
-  if (imminentCatWin) {
-    return winningPosition;
-  }
-
-  // otherwise find the nearest winning tile that has no walls in an adjacent winning tile
-  // find closest exit with generatePath(world)
-  // uses a similar search to the cat but it only looks at border tiles (valid cat win points)
-  int distanceFromCenter = world->getWorldSideSize() / 2;
-  bool hasFoundPoint = false;
-  queue<Point2D> frontier;
-  unordered_set<Point2D> frontierSet;
-  unordered_map<Point2D, bool> visited;
-  Point2D nearestEdge;
-  if (abs(catPosition.x) < abs(catPosition.y)) {
-    nearestEdge = Point2D(catPosition.x,catPosition.y/abs(catPosition.y)*distanceFromCenter);
-  }
-  else {
-    nearestEdge = Point2D(catPosition.x / abs(catPosition.x)*distanceFromCenter, catPosition.y);
-  }
-
-  frontier.push(nearestEdge);
-  frontierSet.insert(nearestEdge);
-  while (!frontier.empty()) {
-    Point2D point = frontier.front();
-    visited[point] = true;
-    frontier.pop();
-
-    vector<Point2D> neighbors = world->neighbors(point);
+  for (int i = 0; i < numberOfBorders; i++) {
     
-
   }
-
+  }
 
 
   auto side = world->getWorldSideSize() / 2;
@@ -60,3 +52,5 @@ Point2D Catcher::Move(World* world) {
     if (cat.x != p.x && cat.y != p.y && !world->getContent(p)) return p;
   }
 }
+
+int Catcher::getAdjacentWalledBorders(Point) {}
