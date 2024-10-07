@@ -13,7 +13,7 @@ public:
   virtual Point2D Move(World*) = 0;
 
   std::vector<Point2D> generatePath(World* w);
-
+  int getManhattanDistanceToBorder(Point2D point, World* w);
 };
 
 #endif  // AGENT_H

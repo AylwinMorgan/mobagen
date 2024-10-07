@@ -63,15 +63,27 @@ std::vector<Point2D> Agent::generatePath(World* w) {
     int iterations = 0;
     Point2D currentPoint = borderExit;
     while (!hasReachedCat && iterations < maxIterations) {
-      currentPoint = cameFrom[currentPoint];
-      path.push_back(currentPoint);
       if (w->getCat() == cameFrom[currentPoint]) {
         hasReachedCat = true;
       }
-      iterations++;
+      else {
+        currentPoint = cameFrom[currentPoint];
+        path.push_back(currentPoint);
+        iterations++;
+      }
     }
   }
   // if there isnt a reachable border, just return empty vector
   // if your vector is filled from the border to the cat, the first element is the catcher move, and the last element is the cat move
   return path;
+}
+
+// heuristic function for A* pathfinding
+int Agent::getManhattanDistanceToBorder(Point2D point,World* world) { 
+    if (abs(point.x) > abs(point.y)) {
+    return world->getWorldSideSize()/2;
+    }
+    else {
+    
+    }
 }
