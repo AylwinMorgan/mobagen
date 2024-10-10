@@ -246,7 +246,7 @@ std::vector<Point2D> World::getBorderSpaces() {
   int sizeOver2 = getWorldSideSize() / 2;
   int x = -sizeOver2;
   int y = -sizeOver2;
-  for (x = -sizeOver2; x < sizeOver2; x++) {
+  for (x = -sizeOver2 + 1; x < sizeOver2; x++) {
     borders.push_back({x, y});
   }
   for (y = -sizeOver2; y < sizeOver2; y++) {
@@ -255,7 +255,7 @@ std::vector<Point2D> World::getBorderSpaces() {
   for (x = sizeOver2; x > -sizeOver2; x--) {
     borders.push_back({x, y});
   }
-  for (y = sizeOver2; y > -sizeOver2; y--) {
+  for (y = sizeOver2 - 1; y > -sizeOver2; y--) {
     borders.push_back({x, y});
   }
   return borders;
