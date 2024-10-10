@@ -17,17 +17,30 @@ Point2D Catcher::Move(World* world) {
   Point2D catTarget = Point2D(0,0);
   if (!catPath.empty()) {
     catTarget = catPath.front();
+    if (catPath.size() == 1) {
+      return catTarget;
+    }
+    
     vector<Point2D> borders = world->getBorderSpaces();
     int targetBorderIndex = world->getBorderIndex(catTarget);
     int numberOfBorders = borders.size();
 
-    if (catPath.size() == 1) {
-      return catTarget;
-    }
     // returns the tile before the exit if the exit is adjacent to one of the corners (disregarding the true left corners because they cannot be
     // reached) this prevents the catcher from getting tricked on the corners
     if (abs(catPath[1].x) == world->getWorldSideSize() / 2 - 1 && abs(catPath[1].y) == world->getWorldSideSize() / 2 - 1) {
       return catPath[1];
+    }
+
+    if (catPath.size() == 2) {
+      for (int i = -2; i <= 2; i++) {
+        Point2D point = borders[(targetBorderIndex + numberOfBorders + i) % numberOfBorders];
+        if (point == catTarget) {
+          continue;
+        }
+        if (!world->getContent(point) && world->isNeighbor(point, catPath[1])) {
+          return catPath[1];
+        }
+      }
     }
 
     for (int i = 0; i < numberOfBorders; i++) {
