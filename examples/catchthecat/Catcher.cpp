@@ -7,9 +7,10 @@
 Point2D Catcher::Move(World* world) {
   // first check if cat is one step from winning and fill in the winning space if needed
   // otherwise check if the cat is two steps from winning on a tile that has less than 2 filled border neighbors, fill if needed
+  // if nearest corner has no filled spaces on perpendicular side, fill
   // otherwise check if there is a border space with no border neighbors, if there is, fill the closest one
   // otherwise fill the cats target (closest border tile) if one is reachable
-  // otherwise fill randomly
+  // otherwise fill randomly around the cat
 
   // watch out for corners, they require special logic
   
@@ -31,7 +32,7 @@ Point2D Catcher::Move(World* world) {
       return catPath[1];
     }
 
-    if (catPath.size() == 2) {
+    if (catPath.size() == 2 && abs(catTarget.x) == world->getWorldSideSize()/2) {
       for (int i = -2; i <= 2; i++) {
         Point2D point = borders[(targetBorderIndex + numberOfBorders + i) % numberOfBorders];
         if (point == catTarget) {
@@ -42,7 +43,7 @@ Point2D Catcher::Move(World* world) {
         }
       }
     }
-
+    // TODO: make the algorithm prioritise the side of the target that is closer to the cat
     for (int i = 0; i < numberOfBorders; i++) {
       int baseIndex = i / 2 * pow(-1, i) + numberOfBorders;
       if (world->getContent(borders[(baseIndex + targetBorderIndex) % numberOfBorders])) {
@@ -55,8 +56,15 @@ Point2D Catcher::Move(World* world) {
       if (world->getContent(borders[(baseIndex + targetBorderIndex + 1) % numberOfBorders])) {
         numberOfAdjacentBorderWalls++;
       }
-      if (numberOfAdjacentBorderWalls == 0
-          || (numberOfAdjacentBorderWalls < 2 && borders[(targetBorderIndex + baseIndex) % numberOfBorders] == catTarget && catPath.size() == 2)) {
+      if (numberOfAdjacentBorderWalls == 0 || (numberOfAdjacentBorderWalls < 2 && borders[(targetBorderIndex + baseIndex) % numberOfBorders] == catTarget && catPath.size() == 2)) {
+        if (numberOfAdjacentBorderWalls > 0) {
+          if (!world->getContent(borders[(targetBorderIndex + baseIndex - 1) % numberOfBorders])) {
+            return borders[(targetBorderIndex + baseIndex - 1) % numberOfBorders];
+          } 
+          else if (!world->getContent(borders[(targetBorderIndex + baseIndex + 1) % numberOfBorders])) {
+            return borders[(targetBorderIndex + baseIndex + 1) % numberOfBorders];
+          }
+        }
         return borders[(targetBorderIndex + baseIndex) % numberOfBorders];
       }
     }
@@ -65,10 +73,13 @@ Point2D Catcher::Move(World* world) {
       return catTarget;
     }
   }
-  auto side = world->getWorldSideSize() / 2;
-  for (;;) {
-    Point2D p = {Random::Range(-side, side), Random::Range(-side, side)};
-    auto cat = world->getCat();
-    if (cat.x != p.x && cat.y != p.y && !world->getContent(p)) return p;
+  vector<Point2D> neighbors = world->neighbors(world->getCat());
+  vector<Point2D> visitableNeighbors;
+  for (Point2D n : neighbors) {
+    if (!world->getContent(n)) {
+      visitableNeighbors.push_back(n);
+    }
   }
+  auto rand = Random::Range(0, visitableNeighbors.size() - 1);
+  return visitableNeighbors[rand];
 }

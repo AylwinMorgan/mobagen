@@ -7,22 +7,13 @@ Point2D Cat::Move(World* world) {
   if (!path.empty()) {
     return path.back();
   }
-  auto rand = Random::Range(0, 5);
-  auto pos = world->getCat();
-  switch (rand) {
-    case 0:
-      return World::NE(pos);
-    case 1:
-      return World::NW(pos);
-    case 2:
-      return World::E(pos);
-    case 3:
-      return World::W(pos);
-    case 4:
-      return World::SW(pos);
-    case 5:
-      return World::SE(pos);
-    default:
-      throw "random out of range";
+  vector<Point2D> neighbors = world->neighbors(world->getCat());
+  vector<Point2D> visitableNeighbors;
+  for (Point2D n : neighbors) {
+    if (!world->getContent(n)) {
+      visitableNeighbors.push_back(n);
+    }
   }
+  auto rand = Random::Range(0, visitableNeighbors.size() - 1);
+  return visitableNeighbors[rand];
 }
