@@ -11,31 +11,38 @@
 // 7. cells closer to center are higher
 
 std::vector<Color32> DiffusionLimitedAggregation::Generate(int sideSize, float displacement) {
-    std::vector<bool> base;
-    for (int x = 0; x < sideSize; x++) {
-        for (int y = 0; y < sideSize; y++) {
-            base.push_back(false);
-        }
-    }
-    base[base.size() / 2] = true;
-    int numberOfPoints = 1;
-    int maxNumberOfPoints = sideSize * sideSize / 4;
-    bool particleExists = false;
-    int pointX = 0;
-    int pointY = 0;
+  for (int i = 0; i < sideSize*sideSize/2; i++) {
+    Particle2D* p = new Particle2D(sideSize);
+    Particle2D::particles.push_back(p);
+  }
+  Particle2D* center = new Particle2D(sideSize / 2, sideSize / 2, sideSize);
+  Particle2D::particles.push_back(center);
 
-    while (numberOfPoints < maxNumberOfPoints) {
-      if (particleExists) {
-        
+  int maxFrozenCount = sideSize*sideSize/4;
+  int frozenCount = 0;
+  while (frozenCount < maxFrozenCount) {
+    frozenCount = 0;
+    for (Particle2D* p : Particle2D::particles) {
+      p->update();
+      if (p->frozen) {
+        frozenCount++;
       }
     }
-    
-    std::vector<Color32> colors;
-    for (int x = 0; x < sideSize; x++) {
-        for (int y = 0; y < sideSize; y++) {
-            
-        }
+  }
+
+  std::vector<Color32> colors;
+  for (int x = 0; x < sideSize; x++) {
+    for (int y = 0; y < sideSize; y++) {
+      colors.push_back(Color::Black);
     }
-    return colors;
+  }
+  for (Particle2D* p : Particle2D::particles) {
+    if (p->frozen) {
+      colors[p->x * sideSize + p->y] = Color::White;
+	}
+	delete p;
+  }
+  Particle2D::particles.clear();
+  return colors;
 }
 std::string DiffusionLimitedAggregation::GetName() { return "Diffusion-limited aggregation"; }

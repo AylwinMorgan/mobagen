@@ -239,6 +239,8 @@ bool World::catWinsOnSpace(Point2D point) {
   return abs(point.x) == sideOver2 || abs(point.y) == sideOver2;
 }
 
+
+
 std::vector<Point2D> World::getBorderSpaces() {
   // generates a vector of points where the first value is the top left
   // the values circle clockwise around the border
@@ -261,6 +263,7 @@ std::vector<Point2D> World::getBorderSpaces() {
   return borders;
 }
 
+// finds the index of a point in the border vector
 int World::getBorderIndex(Point2D point) { 
     if (abs(point.x) != getWorldSideSize() / 2 && abs(point.y) != getWorldSideSize() / 2) {
         // point is not a border

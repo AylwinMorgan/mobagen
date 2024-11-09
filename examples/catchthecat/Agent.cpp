@@ -20,8 +20,6 @@ std::vector<Point2D> Agent::generatePath(World* w) {
   priority_queue<Point2DWithDist> frontier;                   // to store next ones to visit
   unordered_set<Point2D> frontierSet;        // OPTIMIZATION to check faster if a point is in the queue
   unordered_map<Point2D, bool> visited;      // use .at() to get data, if the element dont exist [] will give you wrong results
-  
-  //unordered_map<Point2DWithDist, int> distanceCost;
 
   // bootstrap state
   Point2DWithDist catPos;
@@ -53,7 +51,7 @@ std::vector<Point2D> Agent::generatePath(World* w) {
       if (!w->isValidPosition(neighbors[i])) {
         borderExit = current.point;
       }
-        // point is not cat                 // point has no wall                     // point is not in queue                   // point has not been visited
+        // point is not cat                 // point has no wall              // point is not in queue            // point has not been visited
       else if (w->getCat() != neighbors[i] && !w->getContent(neighbors[i]) && !frontierSet.contains(neighbors[i]) && !visited[neighbors[i]]) {
         visitableNeighbors.push_back(neighbors[i]);
         cameFrom[neighbors[i]] = current.point;
@@ -66,7 +64,6 @@ std::vector<Point2D> Agent::generatePath(World* w) {
         frontierSet.insert(neighbors[i]);
       }
     }
-    //std::vector<Point2D> neighbors = getNeighbors(w, current);
     
     // iterate over the neighs:
     

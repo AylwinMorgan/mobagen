@@ -12,12 +12,12 @@ Point2D Catcher::Move(World* world) {
   // otherwise fill the cats target (closest border tile) if one is reachable
   // otherwise fill randomly around the cat
 
-  // watch out for corners, they require special logic
   
   vector<Point2D> catPath = generatePath(world);
   Point2D catTarget = Point2D(0,0);
   if (!catPath.empty()) {
     catTarget = catPath.front();
+    // if the cat is about to win, stop it
     if (catPath.size() == 1) {
       return catTarget;
     }
@@ -43,8 +43,11 @@ Point2D Catcher::Move(World* world) {
         }
       }
     }
-    // TODO: make the algorithm prioritise the side of the target that is closer to the cat
+
+    // this loop will find the nearest open border tile that has no walls around it
+    // or if the nearest tile has only 1 wall, it will fill it in if the cat is close
     for (int i = 0; i < numberOfBorders; i++) {
+      // base index goes from positive to negative so that the border is checcked evenly in both directions
       int baseIndex = i / 2 * pow(-1, i) + numberOfBorders;
       if (world->getContent(borders[(baseIndex + targetBorderIndex) % numberOfBorders])) {
         continue;
@@ -73,6 +76,7 @@ Point2D Catcher::Move(World* world) {
       return catTarget;
     }
   }
+  // finds a random open point next to the cat
   vector<Point2D> neighbors = world->neighbors(world->getCat());
   vector<Point2D> visitableNeighbors;
   for (Point2D n : neighbors) {
