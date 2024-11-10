@@ -39,20 +39,89 @@ std::vector<Color32> DiffusionLimitedAggregation::Generate(int sideSize, float d
     particleDeviation*=2;
   }
 
+
+  // translate particles to heights + colors
+  // iterate through the vector of particles calculating height and adding non particle spaces to frontier
+  // particles will have a base height of 1, getting lower as they approach the edge
+  // for every space in frontier, set height to slightly less than the average of all adjacent non 0 spaces
+  // 
+
+  heightmap.clear();
+  frontier.clear();
+  for (int i = 0; i < sideSize * sideSize; i++) {
+      heightmap.push_back(0);
+  }
+
+  for (Particle2D* p : Particle2D::particles) {
+  	  int distanceToNearestEdge = sideSize - std::max(abs(sideSize / 2 - p->x), abs(sideSize / 2 - p->y));
+	  // height decreases linearly from 1 at the center to 0.5 at the edge
+      heightmap[p->x * sideSize + p->y] = (distanceToNearestEdge / float(sideSize))*2;
+  }
+
+  // the frontier is pushed outward with height values lowering until everything is filled
+  recalculateFrontier(sideSize);
+  while (!frontier.empty()){
+    for (int i : frontier) {
+      int neighbors[4] = {i-1, i-sideSize, i+sideSize, i+1};
+	  int validNeighbors = 0;
+	  float neighborAvg = 0;
+      for (int n : neighbors) {
+        if (n > 0 && n < sideSize * sideSize) {
+          if (heightmap[n] > 0) {
+            validNeighbors++;
+            neighborAvg += heightmap[n];
+		  }
+		}
+	  }
+      if (validNeighbors > 0) {
+      	neighborAvg / validNeighbors;
+	  }
+      heightmap[i] = neighborAvg - 1/sideSize;
+      auto pos = std::find(frontier.begin(), frontier.end(), i);
+      if (pos != frontier.end()) {
+        frontier.erase(pos);
+	  }
+	}
+    recalculateFrontier(sideSize);
+  }
+
   std::vector<Color32> colors;
-  for (int x = 0; x < sideSize; x++) {
-    for (int y = 0; y < sideSize; y++) {
-      colors.push_back(Color::Black);
-    }
+  for (int i = 0; i < heightmap.size(); i++) {
+    colors.push_back(Color32(heightmap[i] * 255, heightmap[i] * 255, heightmap[i] * 255));
   }
   for (Particle2D* p : Particle2D::particles) {
-    if (p->frozen) {
-      colors[p->x * sideSize + p->y] = Color::White;
-	}
 	delete p;
   }
   Particle2D::particles.clear();
   return colors;
+}
+
+
+void DiffusionLimitedAggregation::recalculateFrontier(int sideSize) {
+  for (int i = 0; i < heightmap.size(); i++) {
+    if (heightmap[i] != 0) {
+      if (i > 0) {
+        if (heightmap[i - 1] == 0 && std::find(frontier.begin(), frontier.end(), i - 1) == frontier.end()) {
+          frontier.push_back(i - 1);
+        }
+      }
+      if (i >= sideSize) {
+        if (heightmap[i - sideSize] == 0 && std::find(frontier.begin(), frontier.end(), i - sideSize) == frontier.end()) {
+          frontier.push_back(i - sideSize);
+        }
+      }
+      if (i < heightmap.size() - sideSize) {
+        if (heightmap[i + sideSize] == 0 && std::find(frontier.begin(), frontier.end(), i + sideSize) == frontier.end()) {
+          frontier.push_back(i + sideSize);
+        }
+      }
+      if (i < heightmap.size() - 1) {
+        if (heightmap[i + 1] == 0 && std::find(frontier.begin(), frontier.end(), i + 1) == frontier.end()) {
+          frontier.push_back(i + 1);
+        }
+      }
+    }
+  }
 }
 
 std::string DiffusionLimitedAggregation::GetName() { return "Diffusion-limited aggregation"; }
