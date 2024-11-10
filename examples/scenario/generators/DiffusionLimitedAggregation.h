@@ -10,6 +10,7 @@ class DiffusionLimitedAggregation : public ScenarioGeneratorBase {
 	private:
         std::vector<float> heightmap;
 		std::vector<int> frontier;
+		std::vector<int> visited;
         void recalculateFrontier(int sideSize);
 };
 
