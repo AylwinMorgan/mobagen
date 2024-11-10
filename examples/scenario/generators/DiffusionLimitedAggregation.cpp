@@ -1,33 +1,42 @@
 #include "DiffusionLimitedAggregation.h"
 
 // reference: https://www.youtube.com/watch?v=gsJHzBTPG0Y
-// 0. start with a small grid
-// 1. place a singe pixel at center of grid
-// 2. add another pixel at a random position
-// 3. move it randomly until it is adjacent to other pixel (pick a random spot on frontier)
-// 4. repeat steps 2 and 3 as many times as desired
-// 5. if grid is sufficiently populated, expand and repeat 2-4
+// 0. start with a small grid (sidesize 5)
+// 1. place a single frozen pixel at center of grid
+// 2. add pixel at random position
+// 3. move it randomly until it is adjacent to frozen pixel and freeze it
+// 4. repeat step 3 until a frozen particle is adjacent to edge (x or y equals 0 or sideSize)
+// 5. expand grid by 5 (up to max sideSize) and repeat 2-4
 // 6. set outermost cells to be height of 1
 // 7. cells closer to center are higher
 
 std::vector<Color32> DiffusionLimitedAggregation::Generate(int sideSize, float displacement) {
-  for (int i = 0; i < sideSize*sideSize/2; i++) {
-    Particle2D* p = new Particle2D(sideSize);
-    Particle2D::particles.push_back(p);
-  }
-  Particle2D* center = new Particle2D(sideSize / 2, sideSize / 2, sideSize);
+  int particleDeviation = 2;
+  // start with a 'seed' particle in the center of the grid to build off of
+  Particle2D* center = Particle2D::Particle2DFixed(particleDeviation + 1, particleDeviation + 1);
   Particle2D::particles.push_back(center);
-
-  int maxFrozenCount = sideSize*sideSize/4;
-  int frozenCount = 0;
-  while (frozenCount < maxFrozenCount) {
-    frozenCount = 0;
-    for (Particle2D* p : Particle2D::particles) {
-      p->update();
-      if (p->frozen) {
-        frozenCount++;
+  center->frozen = true;
+  while (particleDeviation * 2 + 1 < sideSize + 1) {
+    if (particleDeviation > 2) {
+      Particle2D::scaleVectorUp();
+	}
+    // create particles within 'particleDeviation' units of the center of the grid
+    for (int i = 0; i < particleDeviation * 2; i++) {
+      Particle2D* p = new Particle2D(particleDeviation);
+      Particle2D::particles.push_back(p);
+	}
+	bool allFrozen = false;
+    while (!allFrozen) {
+	  allFrozen = true;
+      for (Particle2D* p : Particle2D::particles) {
+        p->update();
+        //if (p->frozen && (p->x == Particle2D::minSize || p->x == Particle2D::maxSize || p->y == Particle2D::minSize || p->y == Particle2D::maxSize)) {
+        if (!p->frozen){
+		  allFrozen = false;
+        }
       }
-    }
+	}
+    particleDeviation*=2;
   }
 
   std::vector<Color32> colors;
@@ -45,4 +54,5 @@ std::vector<Color32> DiffusionLimitedAggregation::Generate(int sideSize, float d
   Particle2D::particles.clear();
   return colors;
 }
+
 std::string DiffusionLimitedAggregation::GetName() { return "Diffusion-limited aggregation"; }

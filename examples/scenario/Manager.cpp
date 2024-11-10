@@ -9,9 +9,9 @@
 
 Manager::Manager(Engine* engine, int size) : GameObject(engine) {
   // todo: add your generator
+  generators.push_back(new DiffusionLimitedAggregation());
   generators.push_back(new ParticleGenerator());
   generators.push_back(new RandomScenarioGenerator());
-  generators.push_back(new DiffusionLimitedAggregation());
 }
 
 void Manager::SetPixels(std::vector<Color32>& input) {
@@ -73,7 +73,9 @@ void Manager::OnGui(ImGuiContext* context) {
   static auto newSize = sideSize;
 
   if (ImGui::SliderInt("Side Size", &newSize, 5, 2048)) {
-    // newSize = (newSize/4)*4 + 1;
+    // sets the side size to the nearest power of 2, rounded down and plus 1
+	int ex = floor(log2(newSize));
+    newSize = (pow(2,ex) + 1);
     if (newSize != sideSize) {
       sideSize = newSize;
       Clear();
